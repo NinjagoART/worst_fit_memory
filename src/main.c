@@ -21,37 +21,59 @@ struct node procees[MAX_PROCESS] = {
 void free_worst(struct memory *m);
 int find_max_node(struct memory m);
 
-void worst_fit(struct memory **m, struct node *proc){	
+void worst_fit(struct memory **m, struct node *proc, int steps){	
 	struct node *tmp = (*m)->head;
 	struct node *bkp = (*m)->head;
 	int max = 0;
 	int pos_node = 0;
 
-	while(tmp != NULL){
-		if (max < tmp->mem_size){
-			if (strcmp(tmp->data, "free!") == 0){
-				max = tmp->mem_size;
-				pos_node++;
-			}
-			else{
-				pos_node++;
-			}
-		}
-		tmp = tmp->next;
-	}
 
-	tmp = bkp;
-	for (int i = 0; i < pos_node; i++){
-		if (strcmp(tmp->data, "free!") == 0){
-			if (tmp->mem_size == max){
-				if (tmp->mem_size >= proc->mem_size){
-					tmp->data = proc->data;
+	if (steps < size_of_memory(**m)){
+		while(tmp != NULL){
+			if (max < tmp->mem_size){
+				if (strcmp(tmp->data, "free!") == 0){
+					max = tmp->mem_size;
+					pos_node++;
+				}
+				else{
+					pos_node++;
 				}
 			}
+			tmp = tmp->next;
 		}
-		tmp = tmp->next;
-	}
 
+		tmp = bkp;
+		for (int i = 0; i < pos_node; i++){
+			if (strcmp(tmp->data, "free!") == 0){
+				if (tmp->mem_size == max){
+					if (tmp->mem_size >= proc->mem_size){
+						tmp->data = proc->data;
+					}
+				}
+			}
+			tmp = tmp->next;
+		}
+		printf("--------------------------\n");
+		show_memory(*m);
+	}
+	else{
+		printf("[!] The memory is full!\n");
+		printf("Freeing memory...\n");
+		free_worst(*m);
+		pos_node = find_max_node(**m);
+		for (int i = 0; i < pos_node; i++){
+			if (strcmp(tmp->data, "free!") == 0){
+				if (tmp->mem_size == max){
+					if (tmp->mem_size >= proc->mem_size){
+						tmp->data = proc->data;
+					}
+				}
+			}
+			tmp = tmp->next;
+		}
+		printf("--------------------------\n");
+		show_memory(*m);
+	}
 
 }
 
@@ -59,37 +81,32 @@ void worst_fit(struct memory **m, struct node *proc){
 int main(int argc, char *argv[]) {
 
 	struct memory *m = new_memory();
-	
 
-	// for (int i = 0; i < 5; i++)
-	// {
-	// 	struct node *n = new_node(rand() % (40 - 3) + 2,  "free!", 0);
-	// 	insert_node(n, m);
-	// }
-	struct node *n1 = new_node(9, "free!");
-	struct node *n2 = new_node(24, "free!");
-	struct node *n3 = new_node(11, "free!");
-	struct node *n4 = new_node(21, "free!");
+	// srand(time(NULL));
 
-	n1->t_CPU = 2003;
-	n2->t_CPU = 77;
-	n4->t_CPU = 122;
-
-	insert_node(n1, m);
-	insert_node(n2, m);
-	insert_node(n3, m);
-	insert_node(n4, m);
+	for (int i = 0; i < 3; i++)
+	{
+		struct node *n = new_node(rand() % (40 - 3) + 2,  "free!");
+		insert_node(n, m);
+	}
+	// struct node *n1 = new_node(9, "free!");
+	// struct node *n2 = new_node(24, "free!");
+	// struct node *n3 = new_node(11, "free!");
+	// struct node *n4 = new_node(21, "free!");
+	//
+	// insert_node(n1, m);
+	// insert_node(n2, m);
+	// insert_node(n3, m);
+	// // insert_node(n4, m);
 
 
 	show_memory(m);
+ 	printf("==========================\n");	
  	
 
-	// for (int i = 0; i < MAX_PROCESS; i++){
-		worst_fit(&m, &procees[0]);	
-		worst_fit(&m, &procees[1]);	
-		worst_fit(&m, &procees[2]);	
-		worst_fit(&m, &procees[3]);	
-	// }
+	for (int i = 0; i < MAX_PROCESS; i++){
+		worst_fit(&m, &procees[i], i);	
+	}
 
  	printf("\n==========================\n");	
 	show_memory(m);
@@ -104,6 +121,8 @@ int main(int argc, char *argv[]) {
 
 
 	del_memory(m);
+	
+
 
 	return EXIT_SUCCESS;
 }
