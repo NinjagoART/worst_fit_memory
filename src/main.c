@@ -18,8 +18,43 @@ struct node procees[MAX_PROCESS] = {
 	{ 5,   12,	0, "dotnet run --project main.csproj",	NULL}
 };
 
-void worst_fit(struct memory *m, struct node *proc, int n);
 void free_worst(struct memory *m);
+int find_max_node(struct memory m);
+
+void worst_fit(struct memory **m, struct node *proc){	
+	struct node *tmp = (*m)->head;
+	struct node *bkp = (*m)->head;
+	int max = 0;
+	int pos_node = 0;
+
+	while(tmp != NULL){
+		if (max < tmp->mem_size){
+			if (strcmp(tmp->data, "free!") == 0){
+				max = tmp->mem_size;
+				pos_node++;
+			}
+			else{
+				pos_node++;
+			}
+		}
+		tmp = tmp->next;
+	}
+
+	tmp = bkp;
+	for (int i = 0; i < pos_node; i++){
+		if (strcmp(tmp->data, "free!") == 0){
+			if (tmp->mem_size == max){
+				if (tmp->mem_size >= proc->mem_size){
+					tmp->data = proc->data;
+				}
+			}
+		}
+		tmp = tmp->next;
+	}
+
+
+}
+
 
 int main(int argc, char *argv[]) {
 
@@ -35,23 +70,26 @@ int main(int argc, char *argv[]) {
 	struct node *n2 = new_node(24, "free!");
 	struct node *n3 = new_node(11, "free!");
 	struct node *n4 = new_node(21, "free!");
-	struct node *n5 = new_node(19, "free!");
-	struct node *n6 = new_node(12, "free!");
+
+	n1->t_CPU = 2003;
+	n2->t_CPU = 77;
+	n4->t_CPU = 122;
 
 	insert_node(n1, m);
 	insert_node(n2, m);
 	insert_node(n3, m);
 	insert_node(n4, m);
-	insert_node(n5, m);
-	insert_node(n6, m);
 
 
 	show_memory(m);
  	
 
-	for (int i = 0; i < MAX_PROCESS; i++){
-		worst_fit(m, &procees[i], i);	
-	}
+	// for (int i = 0; i < MAX_PROCESS; i++){
+		worst_fit(&m, &procees[0]);	
+		worst_fit(&m, &procees[1]);	
+		worst_fit(&m, &procees[2]);	
+		worst_fit(&m, &procees[3]);	
+	// }
 
  	printf("\n==========================\n");	
 	show_memory(m);
@@ -64,31 +102,34 @@ int main(int argc, char *argv[]) {
 	
 	show_memory(m);
 
-	
+
+	del_memory(m);
 
 	return EXIT_SUCCESS;
 }
 
-void worst_fit(struct memory *m, struct node *proc, int n){
-	struct node *head = m->head;
-	struct node *max_node = NULL;
-	int max, mem_count = 0; 
-
-	max = m->head->mem_size; 
-	while (head) {
-        if (strcmp(head->data, "free!") == 0) {
-            if (head->mem_size >= proc->mem_size && head->mem_size > max) {
-                max = head->mem_size;
-                max_node = head;
-            }
-        }
-        mem_count++;
-        head = head->next;
-    }
-	if (max_node){
-		max_node->data = proc->data;
+int find_max_node(struct memory m){
+	struct node *tmp = m.head;
+	int max = 0, count = 0;
+	
+	if (tmp == NULL) {
+		printf("[!] :0!!!!\n");
+	}
+	else{
+		max = tmp->mem_size;
+		while (tmp){
+			if (strcmp(tmp->data, "free!") == 0){
+				if (max < tmp->mem_size){
+					max = tmp->mem_size;
+					count++;
+				}
+			}
+			tmp = tmp->next;
+		}
+		tmp = m.head;
 	}
 
+	return count;
 }
 
 void free_worst(struct memory *m){
