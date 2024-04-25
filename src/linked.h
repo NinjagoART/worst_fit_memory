@@ -1,5 +1,5 @@
 /*=================================================
-	  Basic implemntation of queues (FIFO)
+	  Basic implemntation of linked list
 				by NinjagoRT
 ===================================================*/
 
@@ -37,7 +37,7 @@ struct memory *new_memory();
 void del_memory(struct memory *m);
 void show_memory(struct memory *m);
 
-bool is_empty(struct memory m);
+int size_of_memory(struct memory m);
 
 
 #endif // LINKED_H

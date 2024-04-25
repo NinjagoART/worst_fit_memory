@@ -83,3 +83,13 @@ bool is_empty(struct memory m){
 		}
 	}
 }
+
+int size_of_memory(struct memory m){
+	struct node *tmp = m.head;
+	int size = 0;
+	while(tmp){
+		size++;
+		tmp = tmp->next;
+	}
+	return size;
+}
